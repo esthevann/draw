@@ -26,7 +26,7 @@ const Home: NextPage = () => {
           <div className="p-3"></div>
           <div className="flex gap-6">
             <div className="border-2 border-black">
-              <CanvasDraw canvasHeight={600} canvasWidth={600} hideGrid={true} brushColor={color} ref={a} />
+              <CanvasDraw canvasHeight={600} canvasWidth={1000} hideGrid={true} brushColor={color} ref={a} />
             </div>
             <div>
               <ColorSelector color={color} setColor={setColor}/>
