@@ -5,10 +5,12 @@ import { useState } from "react";
 import CanvasDraw from 'react-canvas-draw'
 import ColorIcon from "../components/ColorIcon";
 import ColorSelector from "../components/ColorSelector";
+import RadiusSelector from "../components/RadiusSelector";
 
 
 const Home: NextPage = () => {
   const [color, setColor] = useState("#000000");
+  const [brushRadius, setBrushRadius] = useState(12);
   const session = useSession({ required: true });
   let a;
   return (
@@ -26,10 +28,11 @@ const Home: NextPage = () => {
           <div className="p-3"></div>
           <div className="flex gap-6">
             <div className="border-2 border-black">
-              <CanvasDraw canvasHeight={600} canvasWidth={1000} hideGrid={true} brushColor={color} ref={a} />
+              <CanvasDraw canvasHeight={600} canvasWidth={1000} brushRadius={brushRadius} hideGrid={true} brushColor={color} ref={a} />
             </div>
-            <div>
+            <div className="flex flex-col gap-3">
               <ColorSelector color={color} setColor={setColor} />
+              <RadiusSelector radius={brushRadius} setRadius={setBrushRadius} />
             </div>
           </div>
         </div>
