@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRef, useState } from "react";
 import CanvasDraw from 'react-canvas-draw'
+import ClearButtons from "../components/ClearButtons";
 import ColorSelector from "../components/ColorSelector";
 import CreatePostModal from "../components/CreatePostModal";
 import RadiusSelector from "../components/RadiusSelector";
@@ -63,6 +64,7 @@ const Home: NextPage = () => {
             </div>
             <div className="flex flex-col gap-3">
               <ColorSelector color={color} setColor={setColor} />
+              {ref.current && <ClearButtons clearCanvas={ref.current.clear} undo={ref.current.undo} setColor={setColor} />}
               <RadiusSelector radius={brushRadius} setRadius={setBrushRadius} />
               <label htmlFor="my-modal" className="btn btn-primary modal-button">Save</label> { /* Create Modal  */}
             </div>
