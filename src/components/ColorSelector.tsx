@@ -1,4 +1,3 @@
-import { ChangeEvent } from "react";
 import ColorIcon from "./ColorIcon";
 
 interface ColorSelectorProps {
@@ -19,7 +18,7 @@ export default function ColorSelector({ color, setColor }: ColorSelectorProps) {
     "#f472b6": "bg-pink-400",
     "#06b6d4": "bg-cyan-500",
   }
-  let items: JSX.Element[] = [];
+  const items: JSX.Element[] = [];
   Object.entries(colors).map(([colorCode, colorName], i) => {
     items.push(
       <button className="btn" onClick={() => setColor(colorCode)} key={i}>
@@ -46,7 +45,7 @@ export default function ColorSelector({ color, setColor }: ColorSelectorProps) {
       </div>
       <div className="btn-group">
         <button className="btn">
-          <input type="text" placeholder={`${color}`} onClick={handleChange} className="input input-bordered w-[144px] h-6" />
+          <input type="text" placeholder={`${color}`} onClick={ handleChange } className="input input-bordered w-[144px] h-6" />
         </button>
       </div>
     </div>

@@ -1,18 +1,49 @@
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import CanvasDraw from 'react-canvas-draw'
-import ColorIcon from "../components/ColorIcon";
 import ColorSelector from "../components/ColorSelector";
+import CreatePostModal from "../components/CreatePostModal";
 import RadiusSelector from "../components/RadiusSelector";
+import { trpc } from "../utils/trpc";
 
 
 const Home: NextPage = () => {
   const [color, setColor] = useState("#000000");
   const [brushRadius, setBrushRadius] = useState(12);
+  const [title, setTitle] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const ref = useRef<CanvasDraw>(null);
+  const postMutater = trpc.useMutation("post.createPost");
   const session = useSession({ required: true });
-  let a;
+
+  function submitter(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (title === "") {
+      setError("Title cannot be empty");
+      setTimeout(() => setError(""), 2000);
+      return;
+    }
+    if (ref.current) {
+      postMutater.mutate({ title, imgSrc: ref.current?.getSaveData() }, {
+        onSuccess: ({id}) => {
+          console.log(id);
+          setTitle("");
+          setSuccess('Post created successfully');
+          setTimeout(() => setSuccess(""), 2000);
+          return;
+        },
+        onError(error) {
+          setError(error.message);
+          setTimeout(() => setError(""), 8000);
+          return;
+        },
+      });
+    }
+  }
+
   return (
     <>
       <Head>
@@ -28,11 +59,12 @@ const Home: NextPage = () => {
           <div className="p-3"></div>
           <div className="flex gap-6">
             <div className="border-2 border-black">
-              <CanvasDraw canvasHeight={600} canvasWidth={1000} brushRadius={brushRadius} hideGrid={true} brushColor={color} ref={a} />
+              <CanvasDraw canvasHeight={600} canvasWidth={1000} brushRadius={brushRadius} hideGrid={true} brushColor={color} ref={ref} />
             </div>
             <div className="flex flex-col gap-3">
               <ColorSelector color={color} setColor={setColor} />
               <RadiusSelector radius={brushRadius} setRadius={setBrushRadius} />
+              <label htmlFor="my-modal" className="btn btn-primary modal-button">Save</label> { /* Create Modal  */}
             </div>
           </div>
         </div>
@@ -45,6 +77,21 @@ const Home: NextPage = () => {
           </ul>
 
         </div>
+        {error && (
+          <div className="toast">
+            <div className="alert alert-error">
+              <div><span>{error}</span></div>
+            </div>
+          </div>
+        )}
+        {success && (
+          <div className="toast">
+            <div className="alert alert-success">
+              <div><span>{success}</span></div>
+            </div>
+          </div>
+        )}
+        <CreatePostModal submitter={submitter} setTitle={setTitle} />
       </div>
 
     </>
