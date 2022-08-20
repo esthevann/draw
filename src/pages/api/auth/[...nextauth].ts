@@ -12,6 +12,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     session({ session, user }) {
       if (session.user) {
+        session.user.fullyRegistered = user.fullyRegistered as string;
         session.user.id = user.id;
       }
       return session;
@@ -34,6 +35,9 @@ export const authOptions: NextAuthOptions = {
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     })
   ],
+  pages: {
+    newUser: "/auth/new-user",
+  }
 };
 
 export default NextAuth(authOptions);

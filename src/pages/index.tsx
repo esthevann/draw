@@ -1,6 +1,7 @@
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useSession, signOut } from "next-auth/react";
 import Head from "next/head";
+import Link from "next/link";
 import { useRef, useState } from "react";
 import CanvasDraw from 'react-canvas-draw'
 import ClearButtons from "../components/ClearButtons";
@@ -30,7 +31,7 @@ const Home: NextPage = () => {
     }
     if (ref.current) {
       postMutater.mutate({ title, imgSrc: ref.current?.getSaveData() }, {
-        onSuccess: ({id}) => {
+        onSuccess: ({ id }) => {
           console.log(id);
           setTitle("");
           setSuccess('Post created successfully');
@@ -76,7 +77,9 @@ const Home: NextPage = () => {
           <ul className="menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content">
 
             <li><a onClick={() => signOut()}>Sign Out</a></li>
-            <li><a>Sidebar Item 2</a></li>
+            {session.data?.user?.name &&
+              <li><Link href={`/user/${session.data.user.name}`}><a>Profile</a></Link></li>
+            }
           </ul>
 
         </div>
