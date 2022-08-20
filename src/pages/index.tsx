@@ -1,5 +1,5 @@
-import type { NextPage } from "next";
-import { useSession } from "next-auth/react";
+import type { GetServerSidePropsContext, NextPage } from "next";
+import { useSession, signOut } from "next-auth/react";
 import Head from "next/head";
 import { useRef, useState } from "react";
 import CanvasDraw from 'react-canvas-draw'
@@ -7,6 +7,7 @@ import ClearButtons from "../components/ClearButtons";
 import ColorSelector from "../components/ColorSelector";
 import CreatePostModal from "../components/CreatePostModal";
 import RadiusSelector from "../components/RadiusSelector";
+import { getServerAuthSession } from "../server/common/auth";
 import { trpc } from "../utils/trpc";
 
 
@@ -74,7 +75,7 @@ const Home: NextPage = () => {
           <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
           <ul className="menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content">
 
-            <li><a>Sidebar Item 1</a></li>
+            <li><a onClick={() => signOut()}>Sign Out</a></li>
             <li><a>Sidebar Item 2</a></li>
           </ul>
 
@@ -100,5 +101,20 @@ const Home: NextPage = () => {
   );
 };
 
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const session = await getServerAuthSession(ctx);
 
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/api/auth/signin",
+      }
+    }
+  }
+  return {
+    props: {
+      session
+    },
+  };
+};
 export default Home;
