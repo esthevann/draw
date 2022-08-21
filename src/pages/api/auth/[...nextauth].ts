@@ -14,6 +14,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.fullyRegistered = user.fullyRegistered as string;
         session.user.id = user.id;
+        session.user.username = user.username as string | undefined;
       }
       return session;
     },

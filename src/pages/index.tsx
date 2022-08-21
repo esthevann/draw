@@ -21,7 +21,7 @@ const Home: NextPage = () => {
   const ref = useRef<CanvasDraw>(null);
   const postMutater = trpc.useMutation("post.createPost");
   const session = useSession({ required: true });
-
+  console.log(session);
   function submitter(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (title === "") {
@@ -78,7 +78,7 @@ const Home: NextPage = () => {
 
             <li><a onClick={() => signOut()}>Sign Out</a></li>
             {session.data?.user?.name &&
-              <li><Link href={`/user/${session.data.user.name}`}><a>Profile</a></Link></li>
+              <li><Link href={`/user/${session.data.user.username}`}><a>Profile</a></Link></li>
             }
           </ul>
 
@@ -111,9 +111,18 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     return {
       redirect: {
         destination: "/api/auth/signin",
+        permanent: false,
+      }
+    }
+  } else if (!session.user?.fullyRegistered) {
+    return {
+      redirect: {
+        destination: "/auth/newUser",
+        permanent: false,
       }
     }
   }
+  
   return {
     props: {
       session
