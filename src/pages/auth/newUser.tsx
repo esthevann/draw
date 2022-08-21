@@ -1,13 +1,11 @@
 import { GetServerSidePropsContext } from "next";
 import { useSession, signIn } from "next-auth/react";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { getServerAuthSession } from "../../server/common/auth";
 import { trpc } from "../../utils/trpc";
 
 export default function NewUser() {
-    const router = useRouter();
     const [username, setUsername] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
