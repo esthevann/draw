@@ -34,7 +34,6 @@ export const userRouter = createProtectedRouter()
                 if (error instanceof Prisma.PrismaClientKnownRequestError) {
                     if (error.code === 'P2002') throw new TRPCError({ code: "CONFLICT" });
                 }
-                console.log(error);
                 
                 throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
             }

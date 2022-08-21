@@ -21,7 +21,7 @@ const Home: NextPage = () => {
   const ref = useRef<CanvasDraw>(null);
   const postMutater = trpc.useMutation("post.createPost");
   const session = useSession({ required: true });
-  console.log(session);
+
   function submitter(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (title === "") {
@@ -32,7 +32,6 @@ const Home: NextPage = () => {
     if (ref.current) {
       postMutater.mutate({ title, imgSrc: ref.current?.getSaveData() }, {
         onSuccess: ({ id }) => {
-          console.log(id);
           setTitle("");
           setSuccess('Post created successfully');
           setTimeout(() => setSuccess(""), 2000);
