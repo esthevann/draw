@@ -27,4 +27,21 @@ export const postsRouter = createProtectedRouter()
             return id;
         }
     })
+    .query("getPostsByUser", {
+        input: z.object({
+            userId: z.string(),
+        }),
+        async resolve({ ctx, input }) {
+            const posts = await ctx.prisma.user.findUnique({
+                where: {
+                    id: input.userId,
+                },
+                select: {
+                    
+                    posts: true,
+                }
+            })
+            return posts;
+        }
+    })
 

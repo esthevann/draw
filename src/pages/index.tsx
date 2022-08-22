@@ -31,8 +31,10 @@ const Home: NextPage = () => {
       setTimeout(() => setError(""), 2000);
       return;
     }
+
     if (ref.current) {
-      postMutater.mutate({ title, imgSrc: ref.current?.getSaveData() }, {
+      // @ts-expect-error https://github.com/embiem/react-canvas-draw/blob/master/src/index.js line 176
+      postMutater.mutate({ title, imgSrc: ref.current?.getDataURL("png", false, "#ffffff") }, {
         onSuccess: () => {
           setTitle("");
           setSuccess('Post created successfully');
@@ -75,11 +77,11 @@ const Home: NextPage = () => {
         </MainContent>
         <Sidebar>
           <>
-          {session.data?.user?.name &&
+            {session.data?.user?.name &&
               <li><Link href={`/user/${session.data.user.username}`}><a>Profile</a></Link></li>
             }
           </>
-            <li><a onClick={() => signOut()}>Sign Out</a></li>
+          <li><a onClick={() => signOut()}>Sign Out</a></li>
         </Sidebar>
         {error && (
           <div className="toast">
