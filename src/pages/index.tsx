@@ -7,6 +7,7 @@ import CanvasDraw from 'react-canvas-draw'
 import ClearButtons from "../components/ClearButtons";
 import ColorSelector from "../components/ColorSelector";
 import CreatePostModal from "../components/CreatePostModal";
+import Footer from "../components/Footer";
 import MainContent from "../components/MainContent";
 import RadiusSelector from "../components/RadiusSelector";
 import Sidebar from "../components/Sidebar";
@@ -58,47 +59,52 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="drawer drawer-mobile">
-        <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-        <MainContent>
-          <h1 className="text-4xl font-bold mt-3 lg:pr-48">Anydraw</h1>
-          <div className="p-3"></div>
-          <div className="flex gap-6">
-            <div className="border-2 border-black">
-              <CanvasDraw canvasHeight={600} canvasWidth={1000} brushRadius={brushRadius} hideGrid={true} brushColor={color} ref={ref} />
+      <div>
+        <div className="drawer drawer-mobile h-[93.2vh]">
+          <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
+          <MainContent>
+            <h1 className="text-4xl font-bold mt-3 lg:pr-48">Anydraw</h1>
+            <div className="p-3"></div>
+            <div className="flex gap-6">
+              <div className="border-2 border-black">
+                <CanvasDraw canvasHeight={600} canvasWidth={1000} brushRadius={brushRadius} hideGrid={true} brushColor={color} ref={ref} />
+              </div>
+              <div className="flex flex-col gap-3">
+                <ColorSelector color={color} setColor={setColor} />
+                {ref.current && <ClearButtons clearCanvas={ref.current.clear} undo={ref.current.undo} setColor={setColor} />}
+                <RadiusSelector radius={brushRadius} setRadius={setBrushRadius} />
+                <label htmlFor="my-modal" className="btn btn-primary modal-button">Save</label> { /* Create Modal  */}
+              </div>
             </div>
-            <div className="flex flex-col gap-3">
-              <ColorSelector color={color} setColor={setColor} />
-              {ref.current && <ClearButtons clearCanvas={ref.current.clear} undo={ref.current.undo} setColor={setColor} />}
-              <RadiusSelector radius={brushRadius} setRadius={setBrushRadius} />
-              <label htmlFor="my-modal" className="btn btn-primary modal-button">Save</label> { /* Create Modal  */}
+          </MainContent>
+          <Sidebar>
+            <>
+              {session.data?.user?.name &&
+                <li><Link href={`/user/${session.data.user.username}`}><a>Profile</a></Link></li>
+              }
+            </>
+            <li><a onClick={() => signOut()}>Sign Out</a></li>
+          </Sidebar>
+
+          {error && (
+            <div className="toast">
+              <div className="alert alert-error">
+                <div><span>{error}</span></div>
+              </div>
             </div>
-          </div>
-        </MainContent>
-        <Sidebar>
-          <>
-            {session.data?.user?.name &&
-              <li><Link href={`/user/${session.data.user.username}`}><a>Profile</a></Link></li>
-            }
-          </>
-          <li><a onClick={() => signOut()}>Sign Out</a></li>
-        </Sidebar>
-        {error && (
-          <div className="toast">
-            <div className="alert alert-error">
-              <div><span>{error}</span></div>
+          )}
+          {success && (
+            <div className="toast">
+              <div className="alert alert-success">
+                <div><span>{success}</span></div>
+              </div>
             </div>
-          </div>
-        )}
-        {success && (
-          <div className="toast">
-            <div className="alert alert-success">
-              <div><span>{success}</span></div>
-            </div>
-          </div>
-        )}
-        <CreatePostModal submitter={submitter} setTitle={setTitle} />
+          )}
+          <CreatePostModal submitter={submitter} setTitle={setTitle} />
+        </div>
+        <Footer />
       </div>
+
 
     </>
   );

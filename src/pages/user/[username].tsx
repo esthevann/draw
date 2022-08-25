@@ -13,6 +13,7 @@ import { trpc } from "../../utils/trpc";
 import Spinner from "../../components/Spinner";
 import Image from "next/future/image";
 import { sliceIfInvalid } from "../../utils/sliceStr";
+import Footer from "../../components/Footer";
 
 interface IProps {
     user: User
@@ -29,34 +30,35 @@ export default function UserPage({ user }: InferGetServerSidePropsType<typeof ge
                 <meta name="description" content="draw anything!" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
+            <div>
+                <div className="drawer drawer-mobile h-[93.2vh]">
+                    <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
 
-            <div className="drawer drawer-mobile">
-                <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
+                    <MainContent>
+                        <h1 className="text-4xl font-bold mt-3 lg:pr-48">{user.name}&apos;s drawings</h1>
+                        <div className="p-6"></div>
+                        {isLoading && <div><Spinner /></div>}
+                        <div className="grid grid-cols-3 gap-3">
+                            {!isLoading && posts && posts.posts.map(post => {
+                                return (
+                                    <div key={post.id} className="flex flex-col w-full p-3">
+                                        <Image width={500} height={500} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`} />
+                                        <h2 className="text-xl font-bold self-center">{post.title}</h2>
+                                    </div>
+                                )
+                            }
+                            )}
+                        </div>
+                    </MainContent>
 
-                <MainContent>
-                    <h1 className="text-4xl font-bold mt-3 lg:pr-48">{user.name}&apos;s drawings</h1>
-                    <div className="p-6"></div>
-                    {isLoading && <div><Spinner /></div>}
-                    <div className="grid grid-cols-3 gap-3">
-                    {!isLoading && posts && posts.posts.map(post => {
-                        return (
-                            <div key={post.id} className="flex flex-col w-full p-3">
-                                <Image width={500} height={500} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`}   />
-                                <h2 className="text-xl font-bold self-center">{post.title}</h2>
-                            </div>
-                        )
-                    }
-                    )}
-                    </div>
-
-                </MainContent>
-
-                <Sidebar>
-                    <li><Link href={"/"}>Home</Link></li>
-                    <li><a onClick={() => signOut()}>Sign Out</a></li>
-                </Sidebar>
-
+                    <Sidebar>
+                        <li><Link href={"/"}>Home</Link></li>
+                        <li><a onClick={() => signOut()}>Sign Out</a></li>
+                    </Sidebar>
+                </div>
+                <Footer />
             </div>
+
         </>
 
     )
