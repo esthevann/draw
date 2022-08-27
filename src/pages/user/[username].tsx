@@ -41,10 +41,12 @@ export default function UserPage({ user }: InferGetServerSidePropsType<typeof ge
                         <div className="grid grid-cols-3 gap-3 p-1">
                             {!isLoading && data && data.posts.map(post => {
                                 return (
-                                    <div key={post.id} className="flex flex-col w-full p-3 hover:bg-gray-500 hover:text-black transition-all duration-200 cursor-pointer">
-                                        <Image width={500} height={500} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`} />
-                                        <h2 className="text-xl font-bold self-center">{post.title}</h2>
-                                    </div>
+                                    <Link href={`/drawing/${post.id}`} key={post.id}>
+                                        <div className="flex flex-col w-full p-3 hover:bg-gray-500 hover:text-black transition-all duration-200 cursor-pointer">
+                                            <Image width={500} height={500} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`} />
+                                            <h2 className="text-xl font-bold self-center">{post.title}</h2>
+                                        </div>
+                                    </Link>
                                 )
                             }
                             )}
