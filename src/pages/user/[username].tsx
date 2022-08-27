@@ -21,7 +21,7 @@ interface IProps {
 
 
 export default function UserPage({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    const { data: posts, isLoading } = trpc.useQuery(['post.getPostsByUser', { userId: user.id }]);
+    const { data, isLoading } = trpc.useQuery(['post.getPostsByUser', { userId: user.id }]);
 
     return (
         <>
@@ -38,10 +38,10 @@ export default function UserPage({ user }: InferGetServerSidePropsType<typeof ge
                         <h1 className="text-4xl font-bold mt-3 lg:pr-48">{user.name}&apos;s drawings</h1>
                         <div className="p-6"></div>
                         {isLoading && <div><Spinner /></div>}
-                        <div className="grid grid-cols-3 gap-3">
-                            {!isLoading && posts && posts.posts.map(post => {
+                        <div className="grid grid-cols-3 gap-3 p-1">
+                            {!isLoading && data && data.posts.map(post => {
                                 return (
-                                    <div key={post.id} className="flex flex-col w-full p-3">
+                                    <div key={post.id} className="flex flex-col w-full p-3 hover:bg-gray-500 hover:text-black transition-all duration-200 cursor-pointer">
                                         <Image width={500} height={500} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`} />
                                         <h2 className="text-xl font-bold self-center">{post.title}</h2>
                                     </div>
