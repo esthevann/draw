@@ -32,12 +32,9 @@ const Home: NextPage = () => {
     if (ref.current) {
       // @ts-expect-error https://github.com/embiem/react-canvas-draw/blob/master/src/index.js line 176
       postMutater.mutate({ title, imgSrc: ref.current?.getDataURL("png", false, "#ffffff") }, {
-        onSuccess: ({ id }) => {
+        onSuccess: () => {
           setTitle("");
           setSuccess('Post created successfully');
-          fetch(`/api/revalidate-post?id=${id}`).then(() => {
-            console.log("revalidate post");
-          });
           setTimeout(() => setSuccess(""), 2000);
           return;
         },
