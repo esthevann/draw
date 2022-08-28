@@ -33,12 +33,28 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
                             <Spinner />
                         </>
                     )}
-                    
+
                     {post && (
                         <>
+
+
                             <h1 className="text-4xl font-bold mt-3 lg:pr-48">{post.title} by {post.User?.name}</h1>
                             <div className="p-3"></div>
-                            <Image width={1000} height={600} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`} />
+                            <div className="flex gap-3 justify-center">
+                                <Image width={1000} height={600} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`} />
+
+                                <div className="flex flex-col gap-1">
+                                    {session.status === "authenticated" && (
+                                        <button className="btn btn-warning">Delete</button>
+                                    )}
+                                    <button className="btn">Copy permalink</button>
+                                </div>
+                            </div>
+
+
+
+
+
                         </>
                     )}
 
