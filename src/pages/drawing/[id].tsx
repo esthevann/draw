@@ -1,5 +1,4 @@
-import type { Post, User } from "@prisma/client"
-import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next"
+import { GetServerSideProps, InferGetServerSidePropsType } from "next"
 import Head from "next/head"
 import { ParsedUrlQuery } from "querystring"
 import Layout from "../../components/Layout"
@@ -7,18 +6,18 @@ import { prisma } from "../../server/db/client"
 import { sliceIfInvalid } from "../../utils/sliceStr"
 import Image from "next/future/image";
 import Link from "next/link"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
+import { trpc } from "../../utils/trpc"
+import Spinner from "../../components/Spinner"
 
 interface IParams extends ParsedUrlQuery {
     id: string
 }
 
-type PostWithUser = (Post & {
-    User: User | null;
-})
 
-
-export default function PostPage({ post }: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function PostPage({ id }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const session = useSession();
+    const { data: post, isLoading } = trpc.useQuery(["postsUnprotected.getPostById", { postId: id }]);
     return (
         <>
             <Head>
@@ -29,40 +28,39 @@ export default function PostPage({ post }: InferGetStaticPropsType<typeof getSta
             <Layout>
                 {/* Main Content  */}
                 <>
-                    <h1 className="text-4xl font-bold mt-3 lg:pr-48">{post.title} by {post.User?.name}</h1>
-                    <div className="p-3"></div>
-                    <Image width={1000} height={600} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`} />
+                    {isLoading && (
+                        <>
+                            <Spinner />
+                        </>
+                    )}
+                    
+                    {post && (
+                        <>
+                            <h1 className="text-4xl font-bold mt-3 lg:pr-48">{post.title} by {post.User?.name}</h1>
+                            <div className="p-3"></div>
+                            <Image width={1000} height={600} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`} />
+                        </>
+                    )}
+
                 </>
 
                 {/* Sidebar */}
                 <>
                     <li><Link href={"/"}>Home</Link></li>
-                    <li><a onClick={() => signOut()}>Sign Out</a></li>
+                    {session.status === "authenticated" && <li><a onClick={() => signOut()}>Sign Out</a></li>}
                 </>
             </Layout>
         </>
     )
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-    const posts = await prisma.post.findMany({});
-
-    const paths = posts.map((post) => ({
-        params: { id: post.id },
-    }));
-
-    return {
-        paths,
-        fallback: "blocking"
-    }
-}
 
 
 
-export const getStaticProps: GetStaticProps<{ post: PostWithUser }> = async (context) => {
+export const getServerSideProps: GetServerSideProps<{ id: string }> = async (context) => {
     const { id } = context.params as IParams
 
-    const post = await prisma.post.findUnique({ where: { id }, include: { User: true } });
+    const post = await prisma.post.findUnique({ where: { id }, select: { id: true } });
 
     if (!post) {
         return {
@@ -70,10 +68,10 @@ export const getStaticProps: GetStaticProps<{ post: PostWithUser }> = async (con
         }
     }
 
-    // Pass post data to the page via props
+    // Pass post id to the page via props
     return {
         props: {
-            post
+            id: post.id
         }
     }
 }
