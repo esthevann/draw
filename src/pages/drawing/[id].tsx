@@ -9,6 +9,8 @@ import Link from "next/link"
 import { signOut, useSession } from "next-auth/react"
 import { trpc } from "../../utils/trpc"
 import Spinner from "../../components/Spinner"
+import { useRouter } from "next/router"
+import { useState } from "react"
 
 interface IParams extends ParsedUrlQuery {
     id: string
@@ -18,10 +20,35 @@ interface IParams extends ParsedUrlQuery {
 export default function PostPage({ id }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const session = useSession();
     const { data: post, isLoading } = trpc.useQuery(["postsUnprotected.getPostById", { postId: id }]);
+    const deleteMutater = trpc.useMutation("post.deletePost");
+    const router = useRouter();
+    const [success, setSuccess] = useState("");
+    const queryClient = trpc.useContext();
+
+    function handleDelete(username: string) {
+        deleteMutater.mutate({ postId: id }, {
+            onSuccess: () => {
+                queryClient.invalidateQueries("post.getPostsByUser");
+                setSuccess("Post deleted successfully");
+                setTimeout(() => {
+                    setSuccess("");
+                    if (username === "") {
+                        router.push("/");
+                    } else {
+                        router.push(`/user/${username}`);
+                    }
+                }, 2000);
+            },
+            onError: (error) => {
+                console.log(error)
+            }
+        });
+    }
+
     return (
         <>
             <Head>
-                <title>page</title>
+                <title>{!isLoading && post ? `${post.title} by ${post.User?.username}`: "Drawing"}</title>
                 <meta name="description" content="draw anything!" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
@@ -44,8 +71,8 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
                                 <Image width={1000} height={600} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`} />
 
                                 <div className="flex flex-col gap-1">
-                                    {session.status === "authenticated" && (
-                                        <button className="btn btn-warning">Delete</button>
+                                    {session.status === "authenticated" && post && (
+                                        <button className="btn btn-warning" onClick={() => handleDelete(post.User?.username || "")}>Delete</button>
                                     )}
                                     <button className="btn">Copy permalink</button>
                                 </div>
@@ -66,6 +93,14 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
                     {session.status === "authenticated" && <li><a onClick={() => signOut()}>Sign Out</a></li>}
                 </>
             </Layout>
+
+            {success && (
+                <div className="toast">
+                    <div className="alert alert-success">
+                        <div><span>{success}</span></div>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

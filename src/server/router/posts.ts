@@ -44,20 +44,17 @@ export const postsRouter = createProtectedRouter()
             return posts;
         }
     })
-    .query("getPostById", {
+    .mutation("deletePost", {
         input: z.object({
             postId: z.string(),
         }),
         async resolve({ ctx, input }) {
-            const post = await ctx.prisma.post.findUnique({
+            const posts = await ctx.prisma.post.delete({
                 where: {
                     id: input.postId,
                 },
-                include: {
-                    User: true
-                }
-            })
-            return post;
+            });
+            return posts;
         }
     })
 
