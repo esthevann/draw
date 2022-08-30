@@ -46,6 +46,15 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
         });
     }
 
+    function handleCopyPermalink (){
+        return navigator.clipboard.writeText(window.location.href).then(() => {
+            setSuccess("Copied to clipboard");
+            setTimeout(() => {
+                setSuccess("");
+            }, 2000);
+        });
+    }
+
     return (
         <>
             <Head>
@@ -65,7 +74,6 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
                     {post && (
                         <>
 
-
                             <h1 className="text-4xl font-bold mt-3 lg:pr-48">{post.title} by {post.User?.name}</h1>
                             <div className="p-3"></div>
                             <div className="flex gap-3 justify-center">
@@ -75,13 +83,9 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
                                     {session.status === "authenticated" && post && (
                                         <button className="btn btn-warning" onClick={() => handleDelete(post.User?.username || "")}>Delete</button>
                                     )}
-                                    <button className="btn">Copy permalink</button>
+                                    <button className="btn" onClick={handleCopyPermalink}>Copy permalink</button>
                                 </div>
                             </div>
-
-
-
-
 
                         </>
                     )}
