@@ -11,6 +11,7 @@ import { trpc } from "../../utils/trpc"
 import Spinner from "../../components/Spinner"
 import { useRouter } from "next/router"
 import { useState } from "react"
+import Toast from "../../components/Toast"
 
 interface IParams extends ParsedUrlQuery {
     id: string
@@ -95,11 +96,7 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
             </Layout>
 
             {success && (
-                <div className="toast">
-                    <div className="alert alert-success">
-                        <div><span>{success}</span></div>
-                    </div>
-                </div>
+                <Toast text={success} type="success" />
             )}
         </>
     )

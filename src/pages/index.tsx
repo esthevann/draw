@@ -7,6 +7,7 @@ import CanvasDraw from 'react-canvas-draw'
 import CanvasArea from "../components/CanvasArea";
 import CreatePostModal from "../components/CreatePostModal";
 import Layout from "../components/Layout";
+import Toast from "../components/Toast";
 import { requireAuth } from "../server/common/requireAuth";
 import { trpc } from "../utils/trpc";
 
@@ -76,18 +77,10 @@ const Home: NextPage = () => {
       </Layout>
 
       {error && (
-        <div className="toast">
-          <div className="alert alert-error">
-            <div><span>{error}</span></div>
-          </div>
-        </div>
+        <Toast text={error} type="error" />
       )}
       {success && (
-        <div className="toast">
-          <div className="alert alert-success">
-            <div><span>{success}</span></div>
-          </div>
-        </div>
+        <Toast text={success} type="success" />
       )}
       <CreatePostModal submitter={submitter} setTitle={setTitle} />
     </>
