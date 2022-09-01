@@ -17,6 +17,6 @@ export default defineNextConfig({
   swcMinify: true,
   experimental: { images: { allowFutureImage: true } },
   images: {
-    domains: ["avatars.githubusercontent.com"]
+    domains: ["avatars.githubusercontent.com", "cdn.discordapp.com", "lh3.googleusercontent.com"]
   }
 });
