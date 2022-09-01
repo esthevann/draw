@@ -15,5 +15,8 @@ function defineNextConfig(config) {
 export default defineNextConfig({
   reactStrictMode: true,
   swcMinify: true,
-  experimental: { images: { allowFutureImage: true } }
+  experimental: { images: { allowFutureImage: true } },
+  images: {
+    domains: ["avatars.githubusercontent.com"]
+  }
 });

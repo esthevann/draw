@@ -2,6 +2,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next"
 import Head from "next/head"
 import { ParsedUrlQuery } from "querystring"
 import Layout from "../../components/Layout"
+import Comment from "../../components/Comment"
 import { prisma } from "../../server/db/client"
 import { sliceIfInvalid } from "../../utils/sliceStr"
 import Image from "next/future/image";
@@ -26,6 +27,8 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
     const [success, setSuccess] = useState("");
     const queryClient = trpc.useContext();
 
+    const [showComments, setShowComments] = useState(false);
+
     function handleDelete(username: string) {
         deleteMutater.mutate({ postId: id }, {
             onSuccess: () => {
@@ -46,7 +49,7 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
         });
     }
 
-    function handleCopyPermalink (){
+    function handleCopyPermalink() {
         return navigator.clipboard.writeText(window.location.href).then(() => {
             setSuccess("Copied to clipboard");
             setTimeout(() => {
@@ -58,7 +61,7 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
     return (
         <>
             <Head>
-                <title>{!isLoading && post ? `${post.title} by ${post.User?.username}`: "Drawing"}</title>
+                <title>{!isLoading && post ? `${post.title} by ${post.User?.username}` : "Drawing"}</title>
                 <meta name="description" content="draw anything!" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
@@ -80,14 +83,35 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
                                 <Image width={1000} height={600} src={sliceIfInvalid(post.imgSrc)} alt={`drawing called ${post.title}`} />
 
                                 <div className="flex flex-col gap-1">
-                                    {session.status === "authenticated" && post && (
+                                    {session.status === "authenticated" && (
                                         <button className="btn btn-warning" onClick={() => handleDelete(post.User?.username || "")}>Delete</button>
                                     )}
                                     <button className="btn" onClick={handleCopyPermalink}>Copy permalink</button>
                                 </div>
                             </div>
 
+
                         </>
+                    )}
+
+                    {session.status === "authenticated" && session.data && (
+                        <div className="mt-3 flex flex-col w-96 pr-44 pb-3">
+                            <button className="btn btn-secondary"
+                                onClick={() => setShowComments(!showComments)}>{showComments ? "Hide comments" : "Show comments"}
+                            </button>
+
+                            <div className={`${showComments ? "flex flex-col gap-2" : "hidden"}`}>
+                                <form action="">
+                                    <div className="p-2"></div>
+                                    <div className="flex gap-2 items-center">
+                                        <Image width={24} height={24} src={session.data.user?.image || ""} alt="user's profile picture"></Image>
+                                        <textarea className="textarea textarea-bordered" placeholder="Enter your comment"></textarea>
+                                        <button className="btn btn-primary">Submit</button>
+                                    </div>
+                                </form>
+                                <Comment img={session.data.user?.image} username={"Esthevn"} />
+                            </div>
+                        </div>
                     )}
 
                 </>
