@@ -14,6 +14,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.fullyRegistered = user.fullyRegistered as string;
         session.user.id = user.id;
+        // @ts-expect-error - This is a custom property
         session.user.username = user.username as string | undefined;
       }
       return session;
