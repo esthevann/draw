@@ -2,6 +2,7 @@ import { GetServerSidePropsContext } from "next";
 import { useSession, signIn } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
+import Toast from "../../components/Toast";
 import { getServerAuthSession } from "../../server/common/auth";
 import { trpc } from "../../utils/trpc";
 
@@ -74,18 +75,10 @@ export default function NewUser() {
                     )}
                 </div>
                 {error && (
-                    <div className="toast">
-                        <div className="alert alert-error">
-                            <div><span>{error}</span></div>
-                        </div>
-                    </div>
+                    <Toast text={error} type="error" />
                 )}
                 {success && (
-                    <div className="toast">
-                        <div className="alert alert-success">
-                            <div><span>{success}</span></div>
-                        </div>
-                    </div>
+                    <Toast text={success} type="success" />
                 )}
             </div>
         </>
@@ -95,15 +88,15 @@ export default function NewUser() {
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     const session = await getServerAuthSession(ctx);
-    
+
     if (!session) {
-      return {
-        redirect: {
-          destination: "/api/auth/signin",
-          permanent: false,
+        return {
+            redirect: {
+                destination: "/api/auth/signin",
+                permanent: false,
+            }
         }
-      }
-    } 
+    }
 
     if (session?.user?.username) {
         return {
@@ -113,10 +106,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
             }
         }
     }
-    
+
     return {
-      props: {
-        session
-      },
+        props: {
+            session
+        },
     };
-  };
+};
