@@ -21,13 +21,25 @@ interface IParams extends ParsedUrlQuery {
 
 export default function PostPage({ id }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const session = useSession();
-    const { data: post, isLoading } = trpc.useQuery(["postsUnprotected.getPostById", { postId: id }]);
-    const deleteMutater = trpc.useMutation("post.deletePost");
-    const router = useRouter();
-    const [success, setSuccess] = useState("");
-    const queryClient = trpc.useContext();
 
+    const queryClient = trpc.useContext();
+    const { data: post, isLoading } = trpc.useQuery(["postsUnprotected.getPostById", { postId: id }]);
+
+    const { data: comments, isLoading: IsCommentsLoading } = trpc.useQuery(
+        // @ts-expect-error - query will only run once post id has been fetched
+        ["comment.getCommentsByPost", { postId: post?.id }],
+        {
+            enabled: !!post?.id
+        });
+
+    const createCommentMutater = trpc.useMutation("comment.createComment");
+    const deleteMutater = trpc.useMutation("post.deletePost");
+
+    const router = useRouter();
+
+    const [success, setSuccess] = useState("");
     const [showComments, setShowComments] = useState(false);
+    const [comment, setComment] = useState("");
 
     function handleDelete(username: string) {
         deleteMutater.mutate({ postId: id }, {
@@ -55,6 +67,17 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
             setTimeout(() => {
                 setSuccess("");
             }, 2000);
+        });
+    }
+
+    function handleCreateComment(comment: string) {
+        createCommentMutater.mutate({ postId: id, text: comment }, {
+            onSuccess: () => {
+                queryClient.invalidateQueries(["comment.getCommentsByPost", { postId: id }]);
+            },
+            onError: (error) => {
+                console.log(error);
+            }
         });
     }
 
