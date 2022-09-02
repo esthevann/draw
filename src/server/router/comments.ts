@@ -12,7 +12,19 @@ export const commentsRouter = createProtectedRouter()
                     id: input.postId,
                 },
                 select: {
-                    comments: true,
+                    comments: {
+                        select: {
+                            id: true,
+                            text: true,
+                            User: {
+                                select: {
+                                    username: true,
+                                    id: true,
+                                    image: true,
+                                }
+                            }
+                        }
+                    },
                 }
             })
             return comments;
@@ -21,7 +33,7 @@ export const commentsRouter = createProtectedRouter()
     .mutation("createComment", {
         input: z.object({
             postId: z.string(),
-            text: z.string(),
+            text: z.string().min(1),
         }),
         async resolve({ ctx, input }) {
             const id = await ctx.prisma.post.update({
@@ -38,7 +50,8 @@ export const commentsRouter = createProtectedRouter()
                 },
                 select: {
                     id: true,
-                }
+                },
+
             })
             return id;
         }
