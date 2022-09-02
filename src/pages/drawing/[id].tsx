@@ -25,7 +25,7 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
     const queryClient = trpc.useContext();
     const { data: post, isLoading } = trpc.useQuery(["postsUnprotected.getPostById", { postId: id }]);
 
-    const { data: comments, isLoading: IsCommentsLoading } = trpc.useQuery(
+    const { data: comments, isLoading: IsCommentsLoading, refetch } = trpc.useQuery(
         // @ts-expect-error - query will only run once post id has been fetched
         ["comment.getCommentsByPost", { postId: post?.id }],
         {
@@ -70,10 +70,11 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
         });
     }
 
-    function handleCreateComment(comment: string) {
+    function handleCreateComment(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
         createCommentMutater.mutate({ postId: id, text: comment }, {
             onSuccess: () => {
-                queryClient.invalidateQueries(["comment.getCommentsByPost", { postId: id }]);
+                refetch();
             },
             onError: (error) => {
                 console.log(error);
@@ -124,15 +125,26 @@ export default function PostPage({ id }: InferGetServerSidePropsType<typeof getS
                             </button>
 
                             <div className={`${showComments ? "flex flex-col gap-2" : "hidden"}`}>
-                                <form action="">
+                                <form onSubmit={handleCreateComment}>
                                     <div className="p-2"></div>
                                     <div className="flex gap-2 items-center">
                                         <Image width={24} height={24} src={session.data.user?.image || ""} alt="user's profile picture"></Image>
-                                        <textarea className="textarea textarea-bordered" placeholder="Enter your comment"></textarea>
+                                        <textarea className="textarea textarea-bordered"
+                                            value={comment} onChange={(e) => setComment(e.target.value)}
+                                            placeholder="Enter your comment"></textarea>
                                         <button className="btn btn-primary">Submit</button>
                                     </div>
                                 </form>
-                                <Comment img={session.data.user?.image} username={"Esthevn"} />
+                                {!IsCommentsLoading && comments && comments.comments.map((comment) => (
+                                    <Comment key={comment.id} comment={comment.text}  img={comment.User.image} username={comment.User.username} />
+                                ))}
+                                {IsCommentsLoading && (
+                                    <Spinner />
+                                )}
+                                {!IsCommentsLoading && comments && comments.comments.length === 0 && (
+                                    <p className="text-center">No comments yet</p>
+                                )}
+                                
                             </div>
                         </div>
                     )}
